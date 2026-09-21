@@ -363,7 +363,7 @@ average (50,000 games).
     include/seabattle/     the library - rules, no input or output
     app/console/           the console application - the only place with cout and cin
     docs/                  the architecture diagram and screenshots
-    tests/                 tests - see "Next" below
+    tests/                 six test programs - see "Testing" below
 
 ---
 
@@ -384,10 +384,36 @@ UndefinedBehaviorSanitizer:
 
 ---
 
+## Testing
+
+    ctest --test-dir build --output-on-failure
+
+In Visual Studio the same tests appear in **Test Explorer**.
+
+Each test is an ordinary program that returns 0 when all its checks pass; there
+is no framework to learn. A failed check prints the line of code that failed.
+
+| test | what it establishes |
+|---|---|
+| `test_board_area` | the ring around a ship is clipped correctly at every edge and corner |
+| `test_placement` | 2,000 random fleets are all legal - right ships, on the board, none touching; the same seed gives the same fleet |
+| `test_own_board` | ten different kinds of illegal fleet are refused and leave the board empty; every shot gets the right answer, a repeat is refused |
+| `test_enemy_map` | 1,000 games against real boards: "sunk" lands only on ships, "empty by deduction" only on water, a hit cell is always a ship still afloat |
+| `test_session` | whole games: observers see the same story, a hit keeps the turn and a miss passes it, the toss is fair, the same seeds replay the same game |
+| `test_console` | the console without a console - typed input and drawn output are strings, because the streams are constructor parameters |
+
+Every test was also checked the other way round: each was run against a
+deliberately broken copy of the code it covers - the touching rule removed, the
+turn passing on a hit instead of a miss, rows numbered from zero - and each one
+failed, as it should.
+
+---
+
 ## Next
 
-* **Tests in the repository.** Everything described above was checked during
-  development, but those checks do not live in `tests/` yet.
+* **A `measure` program** that reproduces the table above from the repository.
+  The numbers were measured during development; the tests check properties, not
+  averages, so they do not reproduce them.
 * **Continuous integration** on GCC, Clang and MSVC, with sanitizers.
 * **A probability-map targeting strategy**: for every unknown cell, count the
   ways the ships still afloat could cover it, and fire where that number is

@@ -17,7 +17,6 @@
  * @todo Leftovers from task 1, still to finish:
  *       - <iostream> is not needed here, only the tests use it;
  *       - <assert.h> should be <cassert>, the C++ spelling;
- *       - redundant const in "const auto begin() const";
  *       - [[nodiscard]] on size/rows/cols/at/begin/end;
  *       - cbegin() / cend();
  *       - MaxSizeT belongs in the class's private section: it is used only
@@ -207,7 +206,7 @@ public:
     }
 
     /** @brief Iterator to the first cell, const overload. */
-    const auto begin() const
+    auto begin() const
     {
         return data_.begin();
     }
@@ -219,7 +218,7 @@ public:
     }
 
     /** @brief Iterator one past the last cell, const overload. */
-    const auto end() const
+    auto end() const
     {
         return data_.end();
     }

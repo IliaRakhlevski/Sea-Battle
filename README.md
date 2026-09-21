@@ -9,7 +9,7 @@ possible to play tens of thousands of games and measure how good a strategy is.
 The console is one client of that library, and it plugs into it through the
 same interfaces anybody else would use.
 
-![A game in progress](docs/images/midgame.png)
+![A hit, then the sinking: the ship turns to * and the water around it is crossed out](docs/images/midgame.png)
 
 ---
 
@@ -45,6 +45,10 @@ The two boards are drawn side by side after every shot:
 
 A cell you have already resolved is refused before the shot is sent, so a
 mistyped repeat never costs a turn.
+
+The game ends when one fleet is gone:
+
+![The end of a game](docs/images/victory.png)
 
 ---
 
@@ -267,6 +271,54 @@ above.
 * **The compiler as a reviewer.** Strict warnings on three compilers,
   AddressSanitizer and UndefinedBehaviorSanitizer, and deleted operations where
   a misuse should fail to compile rather than fail at run time.
+
+---
+
+## Object-oriented design
+
+Object orientation is used where the design needs substitution at run time,
+and deliberately not used where it does not.
+
+### The four principles
+
+* **Encapsulation.** State is private and changed through one door. A `Ship`'s
+  length and damage have no setters; a cell and its ship change together only
+  inside `OwnBoard::receive_shot`; the knowledge map changes only through
+  `EnemyMap::record`. Each class states its invariants (`@invariant`) and keeps
+  them itself instead of trusting its callers to.
+* **Abstraction.** Four interfaces - `IPlacementStrategy`, `ITargetingStrategy`,
+  `IShootable`, `IGameObserver` - tell a caller *what* happens and hide *how*.
+* **Inheritance - of interfaces only.** `Player` implements `IShootable`, the
+  strategies implement theirs, `ConsoleView` implements `IGameObserver`. There
+  is no inheritance of implementation anywhere. `Grid2D` in particular is held,
+  not inherited from: public inheritance would expose `at()` and `fill()` past
+  the boards' invariants, and `Grid2D` has no virtual destructor.
+* **Polymorphism - three kinds, each where it fits.** Run-time polymorphism
+  through the four interfaces; parametric polymorphism through `Grid2D<T>`,
+  used with three unrelated cell types; and a closed set of alternatives
+  through `std::variant` for a cell of one's own board.
+
+### SOLID
+
+| | principle | in this code |
+|---|---|---|
+| **S** | single responsibility | `OwnBoard` - one's own fleet; `EnemyMap` - knowledge of the other; `Session` - the flow of the game; `ConsoleView` - drawing; `coord_format` - turning "B5" into a coordinate |
+| **O** | open for extension, closed for modification | a new strategy or a new front end is added without touching `Player` or `Session` |
+| **L** | Liskov substitution | any `ITargetingStrategy` can replace another because its contract is written down - "returns a cell that is still unknown"; a scripted test double replaces a whole `Player` behind `IShootable` |
+| **I** | interface segregation | `IShootable` has one method; the one optional observer event has an empty default body |
+| **D** | dependency inversion | `Player` depends on four abstractions and is handed their implementations from outside |
+
+### Where object orientation is deliberately not used
+
+* **A cell is a `std::variant`, not a base class with subclasses.** The set of
+  alternatives is closed and known in advance, a board has a hundred cells, and
+  none of them needs a heap allocation or a virtual call. A hierarchy is the
+  right tool when the set is open; here it is not.
+* **`Coords`, `Placement` and `Rect` are plain aggregates.** They are data, not
+  objects with behaviour, and wrapping them in accessors would add nothing.
+* **The placement algorithm's helpers are free functions.** They need no state,
+  so they are not methods of anything - which also makes each one testable on
+  its own.
 
 ---
 

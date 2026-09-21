@@ -1,0 +1,20 @@
+# Keep line endings consistent no matter who edits the files.
+#
+# Git stores LF inside the repository and checks the files out with the
+# native endings of the platform - CRLF on Windows, LF on Linux and macOS.
+# Without this, a file edited on Windows and a file edited on Linux differ
+# on every single line, and every diff becomes unreadable.
+
+* text=auto
+
+*.cpp   text
+*.hpp   text
+*.h     text
+*.txt   text
+*.md    text
+*.yml   text
+*.cmake text
+
+*.png   binary
+*.jpg   binary
+*.gif   binary

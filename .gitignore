@@ -1,0 +1,10 @@
+build/
+out/
+.vs/
+.vscode/
+x64/
+*.user
+*.obj
+*.exe
+*.pdb
+*.ilk

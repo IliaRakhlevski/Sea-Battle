@@ -1,5 +1,7 @@
 # Sea Battle
 
+[![CI](https://github.com/IliaRakhlevski/Sea-Battle/actions/workflows/ci.yml/badge.svg)](https://github.com/IliaRakhlevski/Sea-Battle/actions/workflows/ci.yml)
+
 The Russian variant of Battleship, written in C++17 as a game-rules library with
 a console application on top of it.
 
@@ -388,7 +390,10 @@ UndefinedBehaviorSanitizer:
 
     ctest --test-dir build --output-on-failure
 
-In Visual Studio the same tests appear in **Test Explorer**.
+Every push is built and tested automatically on four configurations - GCC,
+Clang, GCC with AddressSanitizer and UndefinedBehaviorSanitizer, and MSVC on
+Windows - with warnings treated as errors. The badge at the top of this page is
+the result of the latest run.
 
 Each test is an ordinary program that returns 0 when all its checks pass; there
 is no framework to learn. A failed check prints the line of code that failed.
@@ -414,7 +419,6 @@ failed, as it should.
 * **A `measure` program** that reproduces the table above from the repository.
   The numbers were measured during development; the tests check properties, not
   averages, so they do not reproduce them.
-* **Continuous integration** on GCC, Clang and MSVC, with sanitizers.
 * **A probability-map targeting strategy**: for every unknown cell, count the
   ways the ships still afloat could cover it, and fire where that number is
   largest. The numbers to beat are in the table above.

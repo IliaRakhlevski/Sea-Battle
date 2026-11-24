@@ -75,7 +75,9 @@ target_link_libraries(seabattle INTERFACE seabattle_warnings)
 # --- sanitizers: enable with -DSEABATTLE_SANITIZE=ON ---
 option(SEABATTLE_SANITIZE "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 if(SEABATTLE_SANITIZE AND NOT MSVC)
-    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+    # -fno-sanitize-recover=all: stop on the first UBSan error, so the test fails
+    # (by default UBSan only prints a message and the program keeps running)
+    add_compile_options(-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
     add_link_options(-fsanitize=address,undefined)
 endif()
 
